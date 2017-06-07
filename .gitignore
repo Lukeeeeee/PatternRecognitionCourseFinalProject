@@ -104,4 +104,6 @@ ENV/
 .idea/
 *.bmp
 *.jpg
+data/cut_dataset/
+data/nemo_dataset/
 
