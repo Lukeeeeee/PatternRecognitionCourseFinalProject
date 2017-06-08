@@ -12,7 +12,6 @@ class Data(object):
             region = [int(nums[i]) for i in range(1, 4)]
             self.label[nums[0]] = region
 
-
     @staticmethod
     def cut_image_by_grid(image_dir, save_dir, size=(30, 30), stride=10):
 
@@ -49,6 +48,15 @@ class Data(object):
 
         else:
             return 0
+
+
+    def return_test_data(self):
+        pass
+
+    def return_batch_train_data(self, batch_size):
+        pass
+
+
 
 
 
