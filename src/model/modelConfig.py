@@ -36,6 +36,9 @@ class ModelConfig(object):
 
     DROPOUT_PROBABILITY = 0.01
 
+    LEARNING_RATE = 0.01
+    BATCH_SIZE = 100
+
 
 
 

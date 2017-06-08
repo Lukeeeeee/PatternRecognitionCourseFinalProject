@@ -4,17 +4,15 @@ from modelConfig import ModelConfig as conf
 class Model(object):
 
     def __init__(self, data):
-        self.learning_rate = 0.01
-        self.batch_size = 100
+
         self.sess = tf.InteractiveSession()
         self.data = data
 
         self.input = tf.placeholder(tf.float32, [None, conf.INPUT_X_SIZE, conf.INPUT_Y_SIZE, conf.INPUT_CHANNEL])
-        self.output = tf.placeholder(tf.float32, [None, conf.OUTPUT_SIZE])
-        self.is_traning = tf.placeholder(tf.bool)
-        self.pred = self.create_net_work()
-
-
+        self.label = tf.placeholder(tf.float32, [None, conf.OUTPUT_SIZE])
+        self.is_training = tf.placeholder(tf.bool)
+        self.predication = self.create_net_work()
+        self.loss, self.optimizer = self.create_train_method()
 
         self.weight = {
             'conv1_filter': tf.Variable(tf.random_normal([conf.FILTER_SIZE, conf.FILTER_SIZE, conf.INPUT_CHANNEL, conf.LAYER1_CHANNEL])),
@@ -46,18 +44,28 @@ class Model(object):
         fc1 = tf.add(tf.matmul(fc1, self.weight['fc1_weight']), self.bias['fc1'])
         fc1 = tf.nn.relu(fc1)
 
-        if self.is_traning:
+        if self.is_traning is True:
             fc1 = tf.nn.dropout(fc1, conf.DROPOUT_PROBABILITY)
 
         out = tf.add(tf.matmul(fc1, self.weight['out_weight']), self.bias['out'])
         out = tf.nn.softmax(out)
         return out
+
+    def compute_accuracy(self):
+
         pass
 
-    def compute_accuracy(self, ):
-        pass
-    def creat_train_method(self):
-        pass
+    def create_train_method(self):
+        loss = tf.reduce_mean(tf.square(self.label - self.predication))
+
+        optimizer = tf.train.AdagradOptimizer(learning_rate=conf.LEARNING_RATE).minimize(loss)
+
+        return loss, optimizer
+
+    def train(self, data):
+
+        _, cost = self.sess.run([self.optimizer, self.loss], feed_dict={})
+
 
     @staticmethod
     def conv2d(x, filer, b, strides=1):
