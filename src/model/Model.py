@@ -1,6 +1,12 @@
+from __future__ import print_function
 import tensorflow as tf
 from modelConfig import ModelConfig as conf
+from src.data.dataConfig import DataConfig
 from src.data.Data import Data
+import datetime
+import os
+import numpy as np
+import json
 
 
 class Model(object):
@@ -9,6 +15,21 @@ class Model(object):
 
         self.sess = tf.InteractiveSession()
         self.data = data
+
+        ti = datetime.datetime.now()
+        self.log_dir = ('../../log/' + str(ti.month) + '-' + str(ti.day) + '-' + str(ti.hour) + '-'
+                   + str(ti.minute) + '-' + str(ti.second) + '/')
+
+        if not os.path.exists(self.log_dir):
+            os.makedirs(self.log_dir)
+
+        self.loss_log_file = open(self.log_dir + 'loss.txt', "w")
+
+        self.config_log_file = open(self.log_dir + 'config.txt', "a")
+
+        if not os.path.exists(self.log_dir + '/predication/'):
+            os.makedirs(self.log_dir + '/predication/')
+
 
         self.weight = {
             'conv1_filter': tf.Variable(
@@ -58,17 +79,12 @@ class Model(object):
         self.conv1 = conv1
         self.conv2 = conv2
 
-
         if self.is_training is True:
             fc1 = tf.nn.dropout(fc1, conf.DROPOUT_PROBABILITY)
 
         out = tf.add(tf.matmul(fc1, self.weight['out_weight']), self.bias['out'])
         out = tf.nn.softmax(out)
         return out
-
-    def compute_accuracy(self):
-
-        pass
 
     def create_train_method(self):
         # print(self.label)
@@ -84,14 +100,57 @@ class Model(object):
 
     def train(self):
         i = 0
-        for x, label in self.data.return_one_batch_data():
-            _, cost = self.sess.run([self.optimizer, self.loss], feed_dict={self.input: x, self.label: label})
-            i += 1
-            print("Epoch=%3d, Loss=%.10lf" % (i, cost))
+        for epoch in range(conf.EPOCH):
+            avg_loss = 0.0
+            for x, label in self.data.return_one_batch_data():
+                # input_x, input_label = tf.train.shuffle_batch(tensors=[x, label], batch_size=20, num_threads=4,
+                # capacity=50000, min_after_dequeue=20, allow_smaller_final_batch=True)
+                # self.input = input_x
+                # self.label = input_label
+
+                _, cost = self.sess.run([self.optimizer, self.loss], feed_dict={self.input: x, self.label: label})
+
+                avg_loss = (avg_loss * i + cost) / (i + 1.0)
+
+                # _, cost = self.sess.run([self.optimizer, self.loss])
+
+                i += 1
+                print("Epoch = %3d, Iter= %3d, Current Batch Loss= %.10lf, Average Epoch Loss= %.10lf" %
+                      (epoch, i, cost, avg_loss))
+                print("Epoch = %3d, Iter= %3d, Current Batch Loss= %.10lf, Average Epoch Loss= %.10lf" %
+                      (epoch, i, cost, avg_loss), file=self.loss_log_file)
+            model.test(test_image_id=21)
+            model.test(test_image_id=350)
+
+    def test(self, test_image_id):
+        x = self.data.load_test_data(test_image_id=test_image_id)
+
+        res = self.predication.eval(feed_dict={self.input: x})
+        res = np.array(res)
+
+        predication_file = open(self.log_dir + '/predication/' + str(test_image_id) + '.txt', mode="w")
+
+        count = 0
+        label_region_list = []
+        # max_prob_index = np.argmax(res, axis=0)[1]
+
+        for i in range(0, 310, 10):
+            for j in range(0, 230, 10):
+                print("%d %d %d %d %.5lf, %.5lf" % (i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y,
+                                                    res[count][0], res[count][1]), file=predication_file)
+                # if count == max_prob_index:
+                #     label_region_list.append((i, j, i+DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
+                if res[count][1] - res[count][0] > 0.2:
+                    label_region_list.append((i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
+                count += 1
+
+        predication_file.close()
+
+        self.data.draw_new_label(image_id=test_image_id, region_list=label_region_list)
 
     def debug(self):
         for x, label in self.data.return_one_batch_data():
-            res = self.conv3.eval(feed_dict ={self.input: x})
+            res = self.conv3.eval(feed_dict={self.input: x})
             res = self.input.eval(feed_dict={self.input: x})
             res = self.conv1.eval(feed_dict={self.input: x})
 
@@ -108,8 +167,26 @@ class Model(object):
         return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1],
                               padding='SAME')
 
+    def log_config(self):
+        temp = DataConfig()
+        print(json.dumps(temp, default=DataConfig.save_to_dict, indent=4), file=self.config_log_file)
+
+        temp = conf()
+        print(json.dumps(temp, default=conf.save_to_dict, indent=4),file=self.config_log_file)
+
+    def end(self):
+        self.loss_log_file.close()
+        self.config_log_file.close()
+
 if __name__ == '__main__':
     a = Data(label_dir="../../data/label.md")
     model = Model(data=a)
+    model.log_config()
+
     model.train()
+    model.test(test_image_id=21)
+    model.test(test_image_id=350)
+    model.end()
     # model.debug()
+
+    #Do a demo of results:

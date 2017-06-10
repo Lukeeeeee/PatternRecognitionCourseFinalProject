@@ -1,8 +1,10 @@
 from __future__ import print_function
 from PIL import Image
+from PIL import ImageDraw
 import os
 import numpy as np
 from dataConfig import DataConfig as dataConf
+import random
 
 
 class Data(object):
@@ -16,7 +18,6 @@ class Data(object):
             self.label[nums[0]] = region
         self.current_train_data_batch_start = 0
         self.train_data_x, self.train_data_label = self.load_train_data()
-        # self.test_data = self.load_test_data()
         self.train_data_batch_x = self.generate_batch_data(data=self.train_data_x, batch_size=20)
         self.train_data_batch_label = self.generate_batch_data(data=self.train_data_label, batch_size=20)
 
@@ -35,11 +36,6 @@ class Data(object):
                 dir = save_dir + str(i) + '_' + str(j) + '.bmp'
                 sub_image.save(dir)
         print("New grid image set saved at " + save_dir)
-
-    @staticmethod
-    def show_a_pic(dir):
-        im = Image.open(dir)
-        im.show()
 
     @staticmethod
     def measure_similarity_of_two_region(label_region, test_region):
@@ -98,9 +94,15 @@ class Data(object):
                 file = str(i) + "_" + str(j) + ".bmp"
                 data = np.asanyarray(Image.open(load_dir + file))
                 index = str(i) + str(j)
+                if label:
+                    if label_data[index][0] >= 0.99999:
+                        prob = random.uniform(0, 1)
+                        if prob < dataConf.SUB_SAMPLE_RATE:
+                            image_data_x.append(data)
+                            image_data_label.append(label_data[index])
 
-                image_data_x.append(data)
-                image_data_label.append(label_data[index])
+                else:
+                    image_data_x.append(data)
 
         image_data_x = np.array(image_data_x)
         image_data_label = np.array(image_data_label)
@@ -110,32 +112,34 @@ class Data(object):
         else:
             return image_data_x
 
-    def load_test_data(self):
+    def load_test_data(self, test_image_id):
         test_data = []
-        for i in range(1, 500):
-            if str(i) not in self.label:
-                new_data = self.load_cut_image(image_id=i)
-                test_data.append(new_data)
+        new_data = self.load_cut_image(image_id=test_image_id)
+        test_data.append(new_data)
 
         test_data = np.array(test_data)
 
         test_data = np.reshape(test_data, (-1, 30, 30, 3))
+
         return test_data
 
     def load_train_data(self):
 
-        train_data_x = []
-        train_data_label = []
+        train_data_x, train_data_label = self.load_cut_image(image_id=1, label=True)
 
-        for i in range(1, 500):
+        for i in range(2, 500):
             if str(i) in self.label:
                 new_data_x, new_data_label = self.load_cut_image(image_id=i, label=True)
-                train_data_x.append(new_data_x)
-                train_data_label.append(new_data_label)
-        train_data_x = np.array(train_data_x)
+
+                # train_data_x.append(new_data_x)
+                # train_data_label.append(new_data_label)
+                train_data_x = np.concatenate([train_data_x, new_data_x])
+                train_data_label = np.concatenate([train_data_label, new_data_label])
+
+        # train_data_x = np.array(train_data_x)
         train_data_x = np.reshape(train_data_x, (-1, 30, 30, 3))
 
-        train_data_label = np.array(train_data_label)
+        # train_data_label = np.array(train_data_label)
         train_data_label = np.reshape(train_data_label, (-1, 2))
 
         return train_data_x, train_data_label
@@ -153,6 +157,18 @@ class Data(object):
             yield x, label
             t += 1
 
+    def draw_new_label(self, image_id, region_list):
+        im = Image.open('../../data/nemo_dataset/' + str(image_id) + '.bmp')
+        drawer = ImageDraw.Draw(im=im)
+
+        for region in region_list:
+            x_min = region[0]
+            y_min = region[1]
+            x_max = region[2]
+            y_max = region[3]
+            drawer.polygon(xy=[(x_min, y_min), (x_min, y_max), (x_max, y_max), (x_max, y_min)])
+        im.show()
+        pass
 
 if __name__ == '__main__':
 

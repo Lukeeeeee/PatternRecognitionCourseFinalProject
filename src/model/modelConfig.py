@@ -41,6 +41,36 @@ class ModelConfig(object):
 
     LEARNING_RATE = 0.01
     BATCH_SIZE = 20
+    EPOCH = 10
+
+    @staticmethod
+    def save_to_dict(model):
+        return {
+            "INPUT_X_SIZE": model.INPUT_X_SIZE,
+            "INPUT_Y_SIZE": model.INPUT_Y_SIZE,
+            "INPUT_SIZE": model.INPUT_SIZE,
+            "INPUT_CHANNEL": model.INPUT_CHANNEL,
+            "OUTPUT_SIZE": model.OUTPUT_SIZE,
+            "LAYER1_SIZE": model.LAYER1_SIZE,
+            "LAYER1_CHANNEL": model.LAYER1_CHANNEL,
+            "LAYER2_SIZE": model.LAYER2_SIZE,
+            "LAYER2_CHANNEL": model.LAYER2_CHANNEL,
+            "LAYER3_SIZE": model.LAYER3_SIZE,
+            "LAYER3_CHANNEL": model.LAYER3_CHANNEL,
+            "FILTER_SIZE": model.FILTER_SIZE,
+            "CONVOLUTIONAL_STRIDES": model.CONVOLUTIONAL_STRIDES,
+            "MAX_POOLING_STRIDES_1": model.MAX_POOLING_STRIDES_1,
+            "MAX_POOLING_STRIDES_2": model.MAX_POOLING_STRIDES_2,
+            "MAX_POOLING_STRIDES_3": model.MAX_POOLING_STRIDES_3,
+            "FULLY_CONNECTED_INPUT_SIZE": model.FULLY_CONNECTED_INPUT_SIZE,
+            "FULLY_CONNECTED_OUT_SIZE": model.FULLY_CONNECTED_OUT_SIZE,
+            "OUT_LAYER_INPUT_SIZE": model.OUT_LAYER_INPUT_SIZE,
+            "OUT_LAYER_OUT_SIZE": model.OUT_LAYER_OUT_SIZE,
+            "DROPOUT_PROBABILITY": model.DROPOUT_PROBABILITY,
+            "LEARNING_RATE": model.LEARNING_RATE,
+            "BATCH_SIZE": model.BATCH_SIZE,
+            "EPOCH": model.EPOCH,
+        }
 
 
 
