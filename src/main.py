@@ -14,11 +14,11 @@ def log_config():
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    self.config_log_file = open(log_dir + 'config.txt', "a")
-
-def main()
+    config_log_file = open(log_dir + 'config.txt', "a")
 
 
+def main():
+    pass
 
 
 if __name__ == '__main__':

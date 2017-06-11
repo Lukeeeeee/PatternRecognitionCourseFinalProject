@@ -10,13 +10,10 @@ class ModelConfig(object):
 
     OUTPUT_SIZE = 2
 
-    LAYER1_SIZE = 300
-    LAYER1_CHANNEL = 10
+    LAYER1_CHANNEL = 3
 
-    LAYER2_SIZE = 200
-    LAYER2_CHANNEL = 40
+    LAYER2_CHANNEL = 10
 
-    LAYER3_SIZE = 300
     LAYER3_CHANNEL = 1
 
     FILTER_SIZE = 5
@@ -40,8 +37,8 @@ class ModelConfig(object):
     DROPOUT_PROBABILITY = 0.01
 
     LEARNING_RATE = 0.01
-    BATCH_SIZE = 20
-    EPOCH = 10
+    BATCH_SIZE = 100
+    EPOCH = 50000
 
     @staticmethod
     def save_to_dict(model):
@@ -51,11 +48,8 @@ class ModelConfig(object):
             "INPUT_SIZE": model.INPUT_SIZE,
             "INPUT_CHANNEL": model.INPUT_CHANNEL,
             "OUTPUT_SIZE": model.OUTPUT_SIZE,
-            "LAYER1_SIZE": model.LAYER1_SIZE,
             "LAYER1_CHANNEL": model.LAYER1_CHANNEL,
-            "LAYER2_SIZE": model.LAYER2_SIZE,
             "LAYER2_CHANNEL": model.LAYER2_CHANNEL,
-            "LAYER3_SIZE": model.LAYER3_SIZE,
             "LAYER3_CHANNEL": model.LAYER3_CHANNEL,
             "FILTER_SIZE": model.FILTER_SIZE,
             "CONVOLUTIONAL_STRIDES": model.CONVOLUTIONAL_STRIDES,

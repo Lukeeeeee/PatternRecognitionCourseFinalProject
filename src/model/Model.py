@@ -74,17 +74,21 @@ class Model(object):
         fc1 = tf.reshape(conv3, [-1, conf.FULLY_CONNECTED_INPUT_SIZE])
         fc1 = tf.add(tf.matmul(fc1, self.weight['fc1_weight']), self.bias['fc1'])
         fc1 = tf.nn.relu(fc1)
-        self.fc1 = fc1
-        self.conv3 = conv3
-        self.conv1 = conv1
-        self.conv2 = conv2
 
         if self.is_training is True:
             fc1 = tf.nn.dropout(fc1, conf.DROPOUT_PROBABILITY)
 
         out = tf.add(tf.matmul(fc1, self.weight['out_weight']), self.bias['out'])
-        out = tf.nn.softmax(out)
-        return out
+        final = tf.nn.softmax(out)
+
+        self.fc1 = fc1
+        self.conv3 = conv3
+        self.conv1 = conv1
+        self.conv2 = conv2
+        self.out = out
+        self.final = final
+
+        return final
 
     def create_train_method(self):
         # print(self.label)
@@ -108,6 +112,9 @@ class Model(object):
                 # self.input = input_x
                 # self.label = input_label
 
+                # for d in label:
+                #     if d[1] > 0.0:
+                #         print(d)
                 _, cost = self.sess.run([self.optimizer, self.loss], feed_dict={self.input: x, self.label: label})
 
                 avg_loss = (avg_loss * i + cost) / (i + 1.0)
@@ -117,16 +124,24 @@ class Model(object):
                 i += 1
                 print("Epoch = %3d, Iter= %3d, Current Batch Loss= %.10lf, Average Epoch Loss= %.10lf" %
                       (epoch, i, cost, avg_loss))
-                print("Epoch = %3d, Iter= %3d, Current Batch Loss= %.10lf, Average Epoch Loss= %.10lf" %
-                      (epoch, i, cost, avg_loss), file=self.loss_log_file)
-            model.test(test_image_id=21)
-            model.test(test_image_id=350)
+            print("Epoch = %3d, Iter= %3d, Average Epoch Loss= %.10lf" % (epoch, i, avg_loss), file=self.loss_log_file)
+
+            if epoch % 50 == 0:
+                model.test(test_image_id=1)
+                model.test(test_image_id=333)
+                pass
+            # model.test(test_image_id=1)
 
     def test(self, test_image_id):
         x = self.data.load_test_data(test_image_id=test_image_id)
 
         res = self.predication.eval(feed_dict={self.input: x})
+        output = self.out.eval(feed_dict={self.input: x})
+        final = self.final.eval(feed_dict={self.input: x})
+
         res = np.array(res)
+        output = np.array(output)
+        final = np.array(final)
 
         predication_file = open(self.log_dir + '/predication/' + str(test_image_id) + '.txt', mode="w")
 
@@ -153,6 +168,8 @@ class Model(object):
             res = self.conv3.eval(feed_dict={self.input: x})
             res = self.input.eval(feed_dict={self.input: x})
             res = self.conv1.eval(feed_dict={self.input: x})
+
+
 
     @staticmethod
     def conv2d(x, filer, b, strides=1):

@@ -18,8 +18,8 @@ class Data(object):
             self.label[nums[0]] = region
         self.current_train_data_batch_start = 0
         self.train_data_x, self.train_data_label = self.load_train_data()
-        self.train_data_batch_x = self.generate_batch_data(data=self.train_data_x, batch_size=20)
-        self.train_data_batch_label = self.generate_batch_data(data=self.train_data_label, batch_size=20)
+        self.train_data_batch_x = self.generate_batch_data(data=self.train_data_x, batch_size=100)
+        self.train_data_batch_label = self.generate_batch_data(data=self.train_data_label, batch_size=100)
 
     @staticmethod
     def cut_image_by_grid(image_dir, save_dir, size=(30, 30), stride=10):
@@ -87,6 +87,8 @@ class Data(object):
                         elements = line.split(' ')
                         index = str(elements[0]) + str(elements[1])
                         # label_data[index] = elements[4]
+                        if float(elements[4]) < 0.2:
+                            elements[4] = '0.0'
                         label_data[index] = (1.0 - float(elements[4]), float(elements[4]))
 
         for i in range(0, 310, 10):
@@ -100,6 +102,9 @@ class Data(object):
                         if prob < dataConf.SUB_SAMPLE_RATE:
                             image_data_x.append(data)
                             image_data_label.append(label_data[index])
+                    else:
+                        image_data_x.append(data)
+                        image_data_label.append(label_data[index])
 
                 else:
                     image_data_x.append(data)
@@ -170,8 +175,21 @@ class Data(object):
         im.show()
         pass
 
+    def draw_new_image(self, data):
+        im_0 = Image.open('../../data/nemo_dataset/' + "1" + '.bmp')
+
+        im = Image.new(mode=im_0.mode, size=(30, 30))
+        im.frombytes(data=data)
+        im.show()
+        pass
+
+
 if __name__ == '__main__':
 
     a = Data(label_dir="../../data/label.md")
+
+    load_dir = '../../data/cut_dataset/' + '1' + '/'
+    data = np.asanyarray(Image.open(load_dir + '130_70.bmp'))
+    a.draw_new_image(data=data)
 
 
