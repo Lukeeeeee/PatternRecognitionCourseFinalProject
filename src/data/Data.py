@@ -87,8 +87,7 @@ class Data(object):
                         elements = line.split(' ')
                         index = str(elements[0]) + str(elements[1])
                         # label_data[index] = elements[4]
-                        if float(elements[4]) < 0.2:
-                            elements[4] = '0.0'
+
                         label_data[index] = (1.0 - float(elements[4]), float(elements[4]))
 
         for i in range(0, 310, 10):

@@ -6,20 +6,21 @@ import datetime
 import os
 
 
-def log_config():
-    ti = datetime.datetime.now()
-    log_dir = ('../../log/' + str(ti.month) + '-' + str(ti.day) + '-' + str(ti.hour) + '-'
-               + str(ti.minute) + '-' + str(ti.second))
+def train():
 
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    a = Data(label_dir="../data/label.md")
+    model = Model(data=a)
+    model.log_config()
 
-    config_log_file = open(log_dir + 'config.txt', "a")
+    model.train()
+    model.save_model()
+    # model.load_model(log_model_dir='/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-11-17-21-16/model/model.ckpt-50000')
+    # model.train()
 
-
-def main():
-    pass
-
+    model.test(test_image_id=1)
+    model.test(test_image_id=350)
+    model.end()
+    # model.debug()
 
 if __name__ == '__main__':
-    main()
+    train()

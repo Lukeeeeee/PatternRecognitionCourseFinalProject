@@ -11,7 +11,7 @@ import json
 
 class Model(object):
 
-    def __init__(self, data):
+    def __init__(self, data, load_model_dir=None):
 
         self.sess = tf.InteractiveSession()
         self.data = data
@@ -30,6 +30,13 @@ class Model(object):
         if not os.path.exists(self.log_dir + '/predication/'):
             os.makedirs(self.log_dir + '/predication/')
 
+        if not os.path.exists(self.log_dir + '/model/'):
+            os.makedirs(self.log_dir + '/model/')
+
+        self.model_save_dir = self.log_dir + '/model/'
+
+
+        self.current_porject_path = os.getcwd()
 
         self.weight = {
             'conv1_filter': tf.Variable(
@@ -59,6 +66,8 @@ class Model(object):
         self.predication = self.create_net_work()
         self.loss, self.optimizer = self.create_train_method()
 
+        self.saver = tf.train.Saver()
+
         self.sess.run(tf.global_variables_initializer())
 
     def create_net_work(self):
@@ -79,6 +88,7 @@ class Model(object):
             fc1 = tf.nn.dropout(fc1, conf.DROPOUT_PROBABILITY)
 
         out = tf.add(tf.matmul(fc1, self.weight['out_weight']), self.bias['out'])
+        out = tf.nn.relu(out)
         final = tf.nn.softmax(out)
 
         self.fc1 = fc1
@@ -95,8 +105,11 @@ class Model(object):
         # print(self.predication)
         loss = tf.reduce_mean(tf.square(self.label - self.predication))
 
-        print(self.label)
-        print(self.predication)
+        for _, w in self.weight.iteritems():
+            loss = tf.add(conf.L2 * tf.nn.l2_loss(w), loss)
+
+        for _, w in self.bias.iteritems():
+            loss = tf.add(conf.L2 * tf.nn.l2_loss(w), loss)
 
         optimizer = tf.train.AdagradOptimizer(learning_rate=conf.LEARNING_RATE).minimize(loss)
 
@@ -106,6 +119,7 @@ class Model(object):
         i = 0
         for epoch in range(conf.EPOCH):
             avg_loss = 0.0
+            i = 0
             for x, label in self.data.return_one_batch_data():
                 # input_x, input_label = tf.train.shuffle_batch(tensors=[x, label], batch_size=20, num_threads=4,
                 # capacity=50000, min_after_dequeue=20, allow_smaller_final_batch=True)
@@ -127,9 +141,11 @@ class Model(object):
             print("Epoch = %3d, Iter= %3d, Average Epoch Loss= %.10lf" % (epoch, i, avg_loss), file=self.loss_log_file)
 
             if epoch % 50 == 0:
-                model.test(test_image_id=1)
-                model.test(test_image_id=333)
+                # model.test(test_image_id=1)
+                # model.test(test_image_id=345)
                 pass
+            if epoch % 50000 == 0:
+                self.save_model(epoch=epoch)
             # model.test(test_image_id=1)
 
     def test(self, test_image_id):
@@ -163,13 +179,22 @@ class Model(object):
 
         self.data.draw_new_label(image_id=test_image_id, region_list=label_region_list)
 
+    def save_model(self, epoch=conf.EPOCH):
+
+        self.saver.save(self.sess, self.model_save_dir + 'model.ckpt', global_step=epoch)
+        print("Mode saved at " + self.log_dir + 'model.ckpt')
+
+    def load_model(self, log_model_dir=None):
+        if log_model_dir is None:
+            log_model_dir = self.current_porject_path + '/' + self.model_save_dir + 'model.ckpt-' + str(conf.EPOCH)
+        self.saver.restore(self.sess, log_model_dir)
+        print("Mode loaded")
+
     def debug(self):
         for x, label in self.data.return_one_batch_data():
             res = self.conv3.eval(feed_dict={self.input: x})
             res = self.input.eval(feed_dict={self.input: x})
             res = self.conv1.eval(feed_dict={self.input: x})
-
-
 
     @staticmethod
     def conv2d(x, filer, b, strides=1):
@@ -189,21 +214,40 @@ class Model(object):
         print(json.dumps(temp, default=DataConfig.save_to_dict, indent=4), file=self.config_log_file)
 
         temp = conf()
-        print(json.dumps(temp, default=conf.save_to_dict, indent=4),file=self.config_log_file)
+        print(json.dumps(temp, default=conf.save_to_dict, indent=4), file=self.config_log_file)
 
     def end(self):
         self.loss_log_file.close()
         self.config_log_file.close()
 
-if __name__ == '__main__':
+
+def train():
     a = Data(label_dir="../../data/label.md")
     model = Model(data=a)
     model.log_config()
 
     model.train()
-    model.test(test_image_id=21)
+    model.save_model()
+    # model.load_model(
+    #     log_model_dir='/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-11-17-21-16/model/model.ckpt-50000')
+    # model.train()
+
+    model.test(test_image_id=1)
     model.test(test_image_id=350)
     model.end()
     # model.debug()
 
-    #Do a demo of results:
+
+def load_and_test(model_dir):
+    a = Data(label_dir="../../data/label.md")
+    model = Model(data=a)
+    model.load_model(log_model_dir=model_dir)
+    # model.train()
+
+    model.test(test_image_id=1)
+    model.test(test_image_id=350)
+    model.end()
+
+if __name__ == '__main__':
+    load_dir = '/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-11-17-21-16/model/model.ckpt-50000'
+    load_and_test(model_dir=load_dir)

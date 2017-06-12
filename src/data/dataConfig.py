@@ -14,7 +14,8 @@ class DataConfig(object):
     PIC_LENGTH = 320
     PIC_HEIGHT = 240
 
-    SUB_SAMPLE_RATE = 0.8
+    SUB_SAMPLE_RATE = 0.4
+
     @staticmethod
     def save_to_dict(conf):
         return {

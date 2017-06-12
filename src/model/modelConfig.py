@@ -10,9 +10,9 @@ class ModelConfig(object):
 
     OUTPUT_SIZE = 2
 
-    LAYER1_CHANNEL = 3
+    LAYER1_CHANNEL = 6
 
-    LAYER2_CHANNEL = 10
+    LAYER2_CHANNEL = 18
 
     LAYER3_CHANNEL = 1
 
@@ -36,9 +36,11 @@ class ModelConfig(object):
 
     DROPOUT_PROBABILITY = 0.01
 
-    LEARNING_RATE = 0.01
-    BATCH_SIZE = 100
-    EPOCH = 50000
+    LEARNING_RATE = 0.1
+    BATCH_SIZE = 400
+    EPOCH = 1
+
+    L2 = 0.01
 
     @staticmethod
     def save_to_dict(model):
@@ -64,6 +66,7 @@ class ModelConfig(object):
             "LEARNING_RATE": model.LEARNING_RATE,
             "BATCH_SIZE": model.BATCH_SIZE,
             "EPOCH": model.EPOCH,
+            "L2": model.L2
         }
 
 
