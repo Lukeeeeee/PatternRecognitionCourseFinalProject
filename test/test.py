@@ -1,6 +1,5 @@
 from src.data.Data import Data
 from src.model.Model import Model
-from dataset import DATA_PATH
 from log import LOG_PATH
 
 
@@ -33,5 +32,5 @@ def load_and_test(model_dir):
     model.end()
 
 if __name__ == '__main__':
-    load_and_test(model_dir=LOG_PATH + '/6-14-16-5-3/model/model.ckpt-0')
+    load_and_test(model_dir=LOG_PATH + '/../log/6-14-19-4-12/model/model.ckpt-500')
     # train()

@@ -19,7 +19,7 @@ class Model(object):
         self.data = data
 
         ti = datetime.datetime.now()
-        self.log_dir = (LOG_PATH + str(ti.month) + '-' + str(ti.day) + '-' + str(ti.hour) + '-'
+        self.log_dir = (LOG_PATH + '/' + str(ti.month) + '-' + str(ti.day) + '-' + str(ti.hour) + '-'
                    + str(ti.minute) + '-' + str(ti.second) + '/')
 
         if not os.path.exists(self.log_dir):
@@ -181,7 +181,7 @@ class Model(object):
                                                     res[count][0], res[count][1]), file=predication_file)
                 # if count == max_prob_index:
                 #     label_region_list.append((i, j, i+DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
-                if res[count][1] - res[count][0] > 0.4:
+                if res[count][1] - res[count][0] > 0.2:
                     label_region_list.append((i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
                 count += 1
 

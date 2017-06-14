@@ -49,14 +49,15 @@ class Data(object):
     def measure_similarity_of_two_region(label_region, test_region):
 
         intersect_region_x_min = max(min(label_region[0], label_region[2]), min(test_region[0], test_region[2]))
-        intersect_region_x_max = min(max(label_region[1], label_region[3]), max(test_region[1], test_region[3]))
+        intersect_region_x_max = min(max(label_region[0], label_region[2]), max(test_region[0], test_region[2]))
 
-        intersect_region_y_min = max(min(label_region[0], label_region[2]), min(test_region[0], test_region[2]))
+        intersect_region_y_min = max(min(label_region[1], label_region[3]), min(test_region[1], test_region[3]))
         intersect_region_y_max = min(max(label_region[1], label_region[3]), max(test_region[1], test_region[3]))
 
         if intersect_region_x_min < intersect_region_x_max and intersect_region_y_min < intersect_region_y_max:
-            return (intersect_region_x_max - intersect_region_x_min) * (intersect_region_y_max - intersect_region_y_min)\
-                   * 1.0 / ((test_region[3] - test_region[1]) * (test_region[2] - test_region[0]))
+            value = (intersect_region_x_max - intersect_region_x_min) * (intersect_region_y_max - intersect_region_y_min)\
+                    * 1.0 / ((test_region[3] - test_region[1]) * (test_region[2] - test_region[0]))
+            return value
 
         else:
             return 0
@@ -198,6 +199,7 @@ if __name__ == '__main__':
     #     Data.cut_image_by_grid(image_dir=dataConf.NEMO_DATASET_PATH + str(i) + '.bmp', save_dir=dataConf.CUT_DATASET_PATH + '/' + str(i) + '/')
 
     a = Data()
+    # a.calc_similarity_of_labeled_data()
 
     #load_dir = '../../data/cut_dataset/' + '1' + '/'
     # data = np.asanyarray(Image.open(load_dir + '130_70.bmp'))

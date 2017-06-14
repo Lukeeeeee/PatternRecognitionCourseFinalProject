@@ -1,0 +1,38 @@
+{
+    "STRIDE": 10, 
+    "SUB_REGION_X": 60, 
+    "SUB_REGION_Y": 60, 
+    "CUT_DATASET_PATH": "/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/dataset/cut_dataset_2/", 
+    "PIC_HEIGHT": 240, 
+    "SUB_SAMPLE_RATE": 0.3, 
+    "ORIGIN_LABEL_PATH": "/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/dataset/label.md", 
+    "NEMO_DATASET_PATH": "/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/dataset/nemo_dataset/", 
+    "GENERATED_LABEL_PATH": "/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/dataset/label2/", 
+    "PIC_LENGTH": 240
+}
+{
+    "LAYER4_CHANNEL": 72, 
+    "LEARNING_RATE": 0.03, 
+    "BATCH_SIZE": 400, 
+    "INPUT_Y_SIZE": 60, 
+    "CONVOLUTIONAL_STRIDES": 1, 
+    "LAYER1_CHANNEL": 6, 
+    "FULLY_CONNECTED_INPUT_SIZE": 1152, 
+    "OUTPUT_SIZE": 2, 
+    "LAYER2_CHANNEL": 18, 
+    "FILTER_SIZE": 5, 
+    "EPOCH": 500, 
+    "OUT_LAYER_OUT_SIZE": 2, 
+    "L2": 0.03, 
+    "FULLY_CONNECTED_OUT_SIZE": 3600, 
+    "SAVE_MODEL_EVERY_EPOCH": 50, 
+    "INPUT_SIZE": 3600, 
+    "MAX_POOLING_STRIDES_2": 2, 
+    "MAX_POOLING_STRIDES_3": 2, 
+    "MAX_POOLING_STRIDES_1": 2, 
+    "INPUT_CHANNEL": 3, 
+    "INPUT_X_SIZE": 60, 
+    "LAYER3_CHANNEL": 36, 
+    "DROPOUT_PROBABILITY": 0.01, 
+    "OUT_LAYER_INPUT_SIZE": 3600
+}
