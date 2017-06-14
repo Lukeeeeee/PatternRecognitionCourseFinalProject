@@ -144,7 +144,7 @@ class Model(object):
                 # model.test(test_image_id=1)
                 # model.test(test_image_id=345)
                 pass
-            if epoch % 50000 == 0:
+            if epoch % 5000 == 0:
                 self.save_model(epoch=epoch)
             # model.test(test_image_id=1)
 
@@ -250,4 +250,4 @@ def load_and_test(model_dir):
 
 if __name__ == '__main__':
     load_dir = '/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-11-17-21-16/model/model.ckpt-50000'
-    load_and_test(model_dir=load_dir)
+    train()

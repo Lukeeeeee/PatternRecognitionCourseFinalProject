@@ -36,11 +36,11 @@ class ModelConfig(object):
 
     DROPOUT_PROBABILITY = 0.01
 
-    LEARNING_RATE = 0.1
+    LEARNING_RATE = 0.03
     BATCH_SIZE = 400
-    EPOCH = 1
+    EPOCH = 500000
 
-    L2 = 0.01
+    L2 = 0.03
 
     @staticmethod
     def save_to_dict(model):
