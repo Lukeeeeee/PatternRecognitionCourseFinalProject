@@ -1,5 +1,7 @@
 from src.data.Data import Data
 from src.model.Model import Model
+from dataset import DATA_PATH
+from log import LOG_PATH
 
 
 def train():
@@ -26,9 +28,10 @@ def load_and_test(model_dir):
     # model.train()
 
     model.test(test_image_id=1)
-    model.test(test_image_id=350)
+    model.test(test_image_id=100)
+    model.test(test_image_id=470)
     model.end()
 
 if __name__ == '__main__':
-    load_dir = '/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-12-16-46-53/model/model.ckpt-10000'
+    load_and_test(model_dir=LOG_PATH + '/6-14-16-5-3/model/model.ckpt-0')
     # train()

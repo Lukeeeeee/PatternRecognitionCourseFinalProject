@@ -107,6 +107,6 @@ ENV/
 data/cut_dataset/
 data/nemo_dataset/
 data/label/
-log/
+log/*-*/
 
 

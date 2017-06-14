@@ -1,13 +1,13 @@
-import data
+import dataset
 
 
 class DataConfig(object):
 
     # TODO USE THIS ONE
-    ORIGIN_LABEL_PATH = data.DATA_PATH + '/label.md'
-    CUT_DATASET_PATH = data.DATA_PATH + '/cut_dataset_2/'
-    NEMO_DATASET_PATH = data.DATA_PATH + '/nemo_dataset/'
-    GENERATED_LABEL_PATH = data.DATA_PATH + '/label2/'
+    ORIGIN_LABEL_PATH = dataset.DATA_PATH + '/label.md'
+    CUT_DATASET_PATH = dataset.DATA_PATH + '/cut_dataset_2/'
+    NEMO_DATASET_PATH = dataset.DATA_PATH + '/nemo_dataset/'
+    GENERATED_LABEL_PATH = dataset.DATA_PATH + '/label2/'
 
     SUB_REGION_X = 60
     SUB_REGION_Y = 60

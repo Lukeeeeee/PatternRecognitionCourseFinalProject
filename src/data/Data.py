@@ -5,7 +5,7 @@ import os
 import numpy as np
 from dataConfig import DataConfig as dataConf
 import random
-import data
+import dataset
 
 
 class Data(object):

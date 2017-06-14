@@ -41,9 +41,11 @@ class ModelConfig(object):
 
     LEARNING_RATE = 0.03
     BATCH_SIZE = 400
-    EPOCH = 1
+    EPOCH = 500
 
     L2 = 0.03
+
+    SAVE_MODEL_EVERY_EPOCH = 50
 
     @staticmethod
     def save_to_dict(model):
@@ -70,5 +72,6 @@ class ModelConfig(object):
             "LEARNING_RATE": model.LEARNING_RATE,
             "BATCH_SIZE": model.BATCH_SIZE,
             "EPOCH": model.EPOCH,
-            "L2": model.L2
+            "L2": model.L2,
+            "SAVE_MODEL_EVERY_EPOCH": model.SAVE_MODEL_EVERY_EPOCH
         }

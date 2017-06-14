@@ -7,7 +7,8 @@ import datetime
 import os
 import numpy as np
 import json
-from data import DATA_PATH
+from dataset import DATA_PATH
+from log import LOG_PATH
 
 
 class Model(object):
@@ -18,7 +19,7 @@ class Model(object):
         self.data = data
 
         ti = datetime.datetime.now()
-        self.log_dir = ('../../log/' + str(ti.month) + '-' + str(ti.day) + '-' + str(ti.hour) + '-'
+        self.log_dir = (LOG_PATH + str(ti.month) + '-' + str(ti.day) + '-' + str(ti.hour) + '-'
                    + str(ti.minute) + '-' + str(ti.second) + '/')
 
         if not os.path.exists(self.log_dir):
@@ -151,9 +152,11 @@ class Model(object):
                 # model.test(test_image_id=1)
                 # model.test(test_image_id=345)
                 pass
-            if epoch % 5000 == 0:
+            if epoch % conf.SAVE_MODEL_EVERY_EPOCH == 0:
                 self.save_model(epoch=epoch)
             # model.test(test_image_id=1)
+
+        self.save_model(epoch=conf.EPOCH)
 
     def test(self, test_image_id):
         x = self.data.load_test_data(test_image_id=test_image_id)
@@ -178,7 +181,7 @@ class Model(object):
                                                     res[count][0], res[count][1]), file=predication_file)
                 # if count == max_prob_index:
                 #     label_region_list.append((i, j, i+DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
-                if res[count][1] - res[count][0] > 0.2:
+                if res[count][1] - res[count][0] > 0.4:
                     label_region_list.append((i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
                 count += 1
 
