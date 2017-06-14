@@ -5,6 +5,7 @@ import os
 import numpy as np
 from dataConfig import DataConfig as dataConf
 import random
+import data
 
 
 class Data(object):
@@ -22,7 +23,7 @@ class Data(object):
         self.train_data_batch_label = self.generate_batch_data(data=self.train_data_label, batch_size=100)
 
     @staticmethod
-    def cut_image_by_grid(image_dir, save_dir, size=(30, 30), stride=10):
+    def cut_image_by_grid(image_dir, save_dir, size=(60, 60), stride=10):
 
         im = Image.open(image_dir)
 
@@ -31,6 +32,8 @@ class Data(object):
 
         for j in range(0, im.size[1], stride):
             for i in range(0, im.size[0], stride):
+                if i+size[0] > im.width or j + size[1] > im.height:
+                    break
                 region = (i, j, i + size[0], j + size[1])
                 sub_image = im.crop(region)
                 dir = save_dir + str(i) + '_' + str(j) + '.bmp'
@@ -57,7 +60,7 @@ class Data(object):
         # only used once!
 
         for key, value in self.label.iteritems():
-            
+            load_dir = self.label
             label_dir = '../../data/label/' + key + '/'
 
             if not os.path.exists(label_dir):
@@ -185,10 +188,15 @@ class Data(object):
 
 if __name__ == '__main__':
 
-    a = Data(label_dir="../../data/label.md")
+    a = Data(label_dir=data.DATA_PATH + '/label.md')
 
-    load_dir = '../../data/cut_dataset/' + '1' + '/'
-    data = np.asanyarray(Image.open(load_dir + '130_70.bmp'))
-    a.draw_new_image(data=data)
+    for i in range(1, 500):
+        Data.cut_image_by_grid(image_dir=data.DATA_PATH + '/nemo_dataset/' + str(i) + '.bmp',
+                               save_dir=data.DATA_PATH + '/cut_dataset_2/')
+
+
+    # load_dir = '../../data/cut_dataset/' + '1' + '/'
+    # data = np.asanyarray(Image.open(load_dir + '130_70.bmp'))
+    # a.draw_new_image(data=data)
 
 
