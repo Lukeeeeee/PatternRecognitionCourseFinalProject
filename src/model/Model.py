@@ -35,8 +35,7 @@ class Model(object):
 
         self.model_save_dir = self.log_dir + '/model/'
 
-
-        self.current_porject_path = os.getcwd()
+        self.current_project_path = os.getcwd()
 
         self.weight = {
             'conv1_filter': tf.Variable(
@@ -186,7 +185,7 @@ class Model(object):
 
     def load_model(self, log_model_dir=None):
         if log_model_dir is None:
-            log_model_dir = self.current_porject_path + '/' + self.model_save_dir + 'model.ckpt-' + str(conf.EPOCH)
+            log_model_dir = self.current_project_path + '/' + self.model_save_dir + 'model.ckpt-' + str(conf.EPOCH)
         self.saver.restore(self.sess, log_model_dir)
         print("Mode loaded")
 
@@ -249,5 +248,5 @@ def load_and_test(model_dir):
     model.end()
 
 if __name__ == '__main__':
-    load_dir = '/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-11-17-21-16/model/model.ckpt-50000'
+    load_dir = '/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-12-16-46-53/model/model.ckpt-10000'
     train()

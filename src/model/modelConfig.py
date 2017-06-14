@@ -68,9 +68,3 @@ class ModelConfig(object):
             "EPOCH": model.EPOCH,
             "L2": model.L2
         }
-
-
-
-
-
-
