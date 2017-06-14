@@ -7,11 +7,12 @@ import datetime
 import os
 import numpy as np
 import json
+from data import DATA_PATH
 
 
 class Model(object):
 
-    def __init__(self, data, load_model_dir=None):
+    def __init__(self, data):
 
         self.sess = tf.InteractiveSession()
         self.data = data
@@ -44,6 +45,8 @@ class Model(object):
                 tf.random_normal([conf.FILTER_SIZE, conf.FILTER_SIZE, conf.LAYER1_CHANNEL, conf.LAYER2_CHANNEL])),
             'conv3_filter': tf.Variable(
                 tf.random_normal([conf.FILTER_SIZE, conf.FILTER_SIZE, conf.LAYER2_CHANNEL, conf.LAYER3_CHANNEL])),
+            'conv4_filter': tf.Variable(
+                tf.random_normal([conf.FILTER_SIZE, conf.FILTER_SIZE, conf.LAYER3_CHANNEL, conf.LAYER4_CHANNEL])),
             'fc1_weight': tf.Variable(
                 tf.random_normal([conf.FULLY_CONNECTED_INPUT_SIZE, conf.FULLY_CONNECTED_OUT_SIZE])),
             'out_weight': tf.Variable(tf.random_normal([conf.OUT_LAYER_INPUT_SIZE, conf.OUT_LAYER_OUT_SIZE]))
@@ -53,6 +56,7 @@ class Model(object):
             'conv1': tf.Variable(tf.random_normal([conf.LAYER1_CHANNEL])),
             'conv2': tf.Variable(tf.random_normal([conf.LAYER2_CHANNEL])),
             'conv3': tf.Variable(tf.random_normal([conf.LAYER3_CHANNEL])),
+            'conv4': tf.Variable(tf.random_normal([conf.LAYER4_CHANNEL])),
             'fc1': tf.Variable(tf.random_normal([conf.FULLY_CONNECTED_OUT_SIZE])),
             'out': tf.Variable(tf.random_normal([conf.OUT_LAYER_OUT_SIZE]))
         }
@@ -79,7 +83,11 @@ class Model(object):
         conv3 = self.conv2d(x=conv2, filer=self.weight['conv3_filter'], b=self.bias['conv3'], strides=conf.CONVOLUTIONAL_STRIDES)
         conv3 = self.maxpool2d(x=conv3, k=conf.MAX_POOLING_STRIDES_3)
 
-        fc1 = tf.reshape(conv3, [-1, conf.FULLY_CONNECTED_INPUT_SIZE])
+        conv4 = self.conv2d(x=conv3, filer=self.weight['conv4_filter'], b=self.bias['conv4'],
+                            strides=conf.CONVOLUTIONAL_STRIDES)
+        conv4 = self.maxpool2d(x=conv4, k=conf.MAX_POOLING_STRIDES_4)
+
+        fc1 = tf.reshape(conv4, [-1, conf.FULLY_CONNECTED_INPUT_SIZE])
         fc1 = tf.add(tf.matmul(fc1, self.weight['fc1_weight']), self.bias['fc1'])
         fc1 = tf.nn.relu(fc1)
 
@@ -91,9 +99,10 @@ class Model(object):
         final = tf.nn.softmax(out)
 
         self.fc1 = fc1
-        self.conv3 = conv3
         self.conv1 = conv1
         self.conv2 = conv2
+        self.conv3 = conv3
+        self.conv4 = conv4
         self.out = out
         self.final = final
 
@@ -115,7 +124,6 @@ class Model(object):
         return loss, optimizer
 
     def train(self):
-        i = 0
         for epoch in range(conf.EPOCH):
             avg_loss = 0.0
             i = 0
@@ -164,8 +172,8 @@ class Model(object):
         label_region_list = []
         # max_prob_index = np.argmax(res, axis=0)[1]
 
-        for i in range(0, 310, 10):
-            for j in range(0, 230, 10):
+        for i in range(0, 260, 10):
+            for j in range(0, 180, 10):
                 print("%d %d %d %d %.5lf, %.5lf" % (i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y,
                                                     res[count][0], res[count][1]), file=predication_file)
                 # if count == max_prob_index:
@@ -219,34 +227,3 @@ class Model(object):
         self.loss_log_file.close()
         self.config_log_file.close()
 
-
-def train():
-    a = Data(label_dir="../../data/label.md")
-    model = Model(data=a)
-    model.log_config()
-
-    model.train()
-    model.save_model()
-    # model.load_model(
-    #     log_model_dir='/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-11-17-21-16/model/model.ckpt-50000')
-    # model.train()
-
-    model.test(test_image_id=1)
-    model.test(test_image_id=350)
-    model.end()
-    # model.debug()
-
-
-def load_and_test(model_dir):
-    a = Data(label_dir="../../data/label.md")
-    model = Model(data=a)
-    model.load_model(log_model_dir=model_dir)
-    # model.train()
-
-    model.test(test_image_id=1)
-    model.test(test_image_id=350)
-    model.end()
-
-if __name__ == '__main__':
-    load_dir = '/home/mars/ANN/dls/PatternRecognitionCourseFinalProject/log/6-12-16-46-53/model/model.ckpt-10000'
-    train()

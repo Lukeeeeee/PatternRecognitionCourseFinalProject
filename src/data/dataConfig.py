@@ -1,14 +1,16 @@
+import data
 
 
 class DataConfig(object):
 
     # TODO USE THIS ONE
-    LABEL_PATH = ""
-    CUT_DATASET_PATH = ""
-    NEMO_DATASET_PATH = ""
+    ORIGIN_LABEL_PATH = data.DATA_PATH + '/label.md'
+    CUT_DATASET_PATH = data.DATA_PATH + '/cut_dataset_2/'
+    NEMO_DATASET_PATH = data.DATA_PATH + '/nemo_dataset/'
+    GENERATED_LABEL_PATH = data.DATA_PATH + '/label2/'
 
-    SUB_REGION_X = 30
-    SUB_REGION_Y = 30
+    SUB_REGION_X = 60
+    SUB_REGION_Y = 60
     STRIDE = 10
 
     PIC_LENGTH = 320
@@ -19,7 +21,8 @@ class DataConfig(object):
     @staticmethod
     def save_to_dict(conf):
         return {
-            'LABEL_PATH': conf.LABEL_PATH,
+            'ORIGIN_LABEL_PATH': conf.ORIGIN_LABEL_PATH,
+            'GENERATED_LABEL_PATH': conf.GENERATED_LABEL_PATH,
             'CUT_DATASET_PATH': conf.CUT_DATASET_PATH,
             'NEMO_DATASET_PATH': conf.NEMO_DATASET_PATH,
             'SUB_REGION_X': conf.SUB_REGION_X,

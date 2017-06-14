@@ -9,8 +9,13 @@ import data
 
 
 class Data(object):
-    def __init__(self, label_dir):
-        f = open(label_dir, mode='r')
+    def __init__(self):
+        self.origin_label_dir = dataConf.ORIGIN_LABEL_PATH
+        self.cut_dataset_dir = dataConf.CUT_DATASET_PATH
+        self.nemo_dataset_dir = dataConf.NEMO_DATASET_PATH
+        self.generated_label_dir = dataConf.GENERATED_LABEL_PATH
+
+        f = open(self.origin_label_dir, mode='r')
         label = f.readlines()
         self.label = {}
         for line in label:
@@ -60,13 +65,14 @@ class Data(object):
         # only used once!
 
         for key, value in self.label.iteritems():
-            load_dir = self.label
-            label_dir = '../../data/label/' + key + '/'
 
-            if not os.path.exists(label_dir):
-                os.makedirs(label_dir)
-            file_dir = label_dir + str(key) + ".md"
-            with open(file_dir, "w") as f:
+            file_dir = self.generated_label_dir + str(key) + '/'
+            file_name = file_dir + str(key) + ".md"
+
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)
+
+            with open(file_name, "w") as f:
                 for i in range(0, dataConf.PIC_LENGTH, 10):
                     for j in range(0, dataConf.PIC_HEIGHT, 10):
                         test_region = (i, j, i+dataConf.SUB_REGION_X, j+dataConf.SUB_REGION_Y)
@@ -74,16 +80,15 @@ class Data(object):
                         print("%d %d %d %d %.5lf" %
                               (test_region[0], test_region[1], test_region[2], test_region[3], results), file=f)
 
-    @staticmethod
-    def load_cut_image(image_id, label=False):
+    def load_cut_image(self, image_id, label=False):
         # [0..310][0..230]
-        load_dir = '../../data/cut_dataset/' + str(image_id) + '/'
+        load_dir = self.cut_dataset_dir + str(image_id) + '/'
         image_data_x = []
         image_data_label = []
 
         label_data = {}
         if label is True:
-            with open('../../data/label/' + str(image_id) + '/' + str(image_id) + '.md') as f:
+            with open(self.generated_label_dir + str(image_id) + '/' + str(image_id) + '.md') as f:
                 lines = f.readlines()
                 for line in lines:
                     if len(line) > 1:
@@ -93,8 +98,8 @@ class Data(object):
 
                         label_data[index] = (1.0 - float(elements[4]), float(elements[4]))
 
-        for i in range(0, 310, 10):
-            for j in range(0, 230, 10):
+        for i in range(0, 260, 10):
+            for j in range(0, 180, 10):
                 file = str(i) + "_" + str(j) + ".bmp"
                 data = np.asanyarray(Image.open(load_dir + file))
                 index = str(i) + str(j)
@@ -126,7 +131,7 @@ class Data(object):
 
         test_data = np.array(test_data)
 
-        test_data = np.reshape(test_data, (-1, 30, 30, 3))
+        test_data = np.reshape(test_data, (-1, dataConf.SUB_REGION_X, dataConf.SUB_REGION_Y, 3))
 
         return test_data
 
@@ -144,7 +149,7 @@ class Data(object):
                 train_data_label = np.concatenate([train_data_label, new_data_label])
 
         # train_data_x = np.array(train_data_x)
-        train_data_x = np.reshape(train_data_x, (-1, 30, 30, 3))
+        train_data_x = np.reshape(train_data_x, (-1, dataConf.SUB_REGION_X, dataConf.SUB_REGION_Y, 3))
 
         # train_data_label = np.array(train_data_label)
         train_data_label = np.reshape(train_data_label, (-1, 2))
@@ -165,7 +170,7 @@ class Data(object):
             t += 1
 
     def draw_new_label(self, image_id, region_list):
-        im = Image.open('../../data/nemo_dataset/' + str(image_id) + '.bmp')
+        im = Image.open(self.nemo_dataset_dir + str(image_id) + '.bmp')
         drawer = ImageDraw.Draw(im=im)
 
         for region in region_list:
@@ -175,10 +180,11 @@ class Data(object):
             y_max = region[3]
             drawer.polygon(xy=[(x_min, y_min), (x_min, y_max), (x_max, y_max), (x_max, y_min)])
         im.show()
+        im.close()
         pass
 
     def draw_new_image(self, data):
-        im_0 = Image.open('../../data/nemo_dataset/' + "1" + '.bmp')
+        im_0 = Image.open(self.nemo_dataset_dir + "1" + '.bmp')
 
         im = Image.new(mode=im_0.mode, size=(30, 30))
         im.frombytes(data=data)
@@ -188,14 +194,12 @@ class Data(object):
 
 if __name__ == '__main__':
 
-    a = Data(label_dir=data.DATA_PATH + '/label.md')
+    # for i in xrange(1, 500):
+    #     Data.cut_image_by_grid(image_dir=dataConf.NEMO_DATASET_PATH + str(i) + '.bmp', save_dir=dataConf.CUT_DATASET_PATH + '/' + str(i) + '/')
 
-    for i in range(1, 500):
-        Data.cut_image_by_grid(image_dir=data.DATA_PATH + '/nemo_dataset/' + str(i) + '.bmp',
-                               save_dir=data.DATA_PATH + '/cut_dataset_2/')
+    a = Data()
 
-
-    # load_dir = '../../data/cut_dataset/' + '1' + '/'
+    #load_dir = '../../data/cut_dataset/' + '1' + '/'
     # data = np.asanyarray(Image.open(load_dir + '130_70.bmp'))
     # a.draw_new_image(data=data)
 
