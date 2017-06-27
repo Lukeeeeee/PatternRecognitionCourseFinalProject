@@ -6,6 +6,7 @@ import numpy as np
 from dataConfig import DataConfig as dataConf
 import random
 import dataset
+import log
 
 
 class Data(object):
@@ -99,8 +100,8 @@ class Data(object):
 
                         label_data[index] = (1.0 - float(elements[4]), float(elements[4]))
 
-        for i in range(0, 260, 10):
-            for j in range(0, 180, 10):
+        for i in range(0, 270, 10):
+            for j in range(0, 190, 10):
                 file = str(i) + "_" + str(j) + ".bmp"
                 data = np.asanyarray(Image.open(load_dir + file))
                 index = str(i) + str(j)
@@ -140,7 +141,7 @@ class Data(object):
 
         train_data_x, train_data_label = self.load_cut_image(image_id=1, label=True)
 
-        for i in range(2, 500):
+        for i in range(2, 501):
             if str(i) in self.label:
                 new_data_x, new_data_label = self.load_cut_image(image_id=i, label=True)
 
@@ -170,7 +171,7 @@ class Data(object):
             yield x, label
             t += 1
 
-    def draw_new_label(self, image_id, region_list):
+    def draw_new_label(self, image_id, region_list, save_dir=None):
         im = Image.open(self.nemo_dataset_dir + str(image_id) + '.bmp')
         drawer = ImageDraw.Draw(im=im)
 
@@ -180,7 +181,11 @@ class Data(object):
             x_max = region[2]
             y_max = region[3]
             drawer.polygon(xy=[(x_min, y_min), (x_min, y_max), (x_max, y_max), (x_max, y_min)])
-        im.show()
+        if save_dir:
+            im.save(save_dir + str(image_id) + '.bmp')
+            print("New image " + save_dir + str(image_id) + '.bmp' + "saved.")
+        else:
+            im.show()
         im.close()
         pass
 

@@ -37,6 +37,11 @@ class Model(object):
 
         self.model_save_dir = self.log_dir + '/model/'
 
+        self.test_image_save_dir = self.log_dir + '/predication/'
+
+        if not os.path.exists(self.test_image_save_dir):
+            os.makedirs(self.test_image_save_dir)
+
         self.current_project_path = os.getcwd()
 
         self.weight = {
@@ -158,7 +163,7 @@ class Model(object):
 
         self.save_model(epoch=conf.EPOCH)
 
-    def test(self, test_image_id):
+    def test(self, test_image_id, save_dir=None):
         x = self.data.load_test_data(test_image_id=test_image_id)
 
         res = self.predication.eval(feed_dict={self.input: x})
@@ -175,19 +180,25 @@ class Model(object):
         label_region_list = []
         # max_prob_index = np.argmax(res, axis=0)[1]
 
-        for i in range(0, 260, 10):
-            for j in range(0, 180, 10):
+        region_max_value = 0.0
+        region_point = (0, 0)
+
+        for i in range(0, 270, 10):
+            for j in range(0, 190, 10):
                 print("%d %d %d %d %.5lf, %.5lf" % (i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y,
                                                     res[count][0], res[count][1]), file=predication_file)
                 # if count == max_prob_index:
                 #     label_region_list.append((i, j, i+DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
-                if res[count][1] - res[count][0] > 0.2:
-                    label_region_list.append((i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
+                if res[count][1] >= region_max_value:
+                    region_max_value = res[count][1]
+                    # label_region_list.append((i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y))
+                    region_point = (i, j, i + DataConfig.SUB_REGION_X, j + DataConfig.SUB_REGION_Y)
+
                 count += 1
 
         predication_file.close()
 
-        self.data.draw_new_label(image_id=test_image_id, region_list=label_region_list)
+        self.data.draw_new_label(image_id=test_image_id, region_list=[region_point], save_dir=save_dir)
 
     def save_model(self, epoch=conf.EPOCH):
 
