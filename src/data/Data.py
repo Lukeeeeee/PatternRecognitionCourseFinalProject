@@ -183,7 +183,7 @@ class Data(object):
             drawer.polygon(xy=[(x_min, y_min), (x_min, y_max), (x_max, y_max), (x_max, y_min)])
         if save_dir:
             im.save(save_dir + str(image_id) + '.bmp')
-            print("New image " + save_dir + str(image_id) + '.bmp' + "saved.")
+            print("New image " + save_dir + str(image_id) + '.bmp ' + "saved.")
         else:
             im.show()
         im.close()

@@ -209,7 +209,7 @@ class Model(object):
         if log_model_dir is None:
             log_model_dir = self.current_project_path + '/' + self.model_save_dir + 'model.ckpt-' + str(conf.EPOCH)
         self.saver.restore(self.sess, log_model_dir)
-        print("Mode loaded")
+        print("Mode at %s loaded" % log_model_dir)
 
     def debug(self):
         for x, label in self.data.return_one_batch_data():
